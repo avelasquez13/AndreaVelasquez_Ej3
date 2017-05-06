@@ -49,18 +49,28 @@ for i in range(350):
     dat_lin = linea.split()
     dat = np.array(dat_lin,dtype='int')
     valid_labels[i] = dat[0]
-    
-for x in [10, 15, 20, 25, 30, 35, 40, 45]:
-    rf = RandomForestClassifier(n_estimators=x)
+
+
+N=10
+est=50
+predict=np.zeros(350)
+ii=np.zeros(100000)
+for n in range(N):
+    rf = RandomForestClassifier(n_estimators=est)
     rf.fit(train_data,train_labels.T[0])
 
-    predict = rf.predict(valid_data)
+    predict += rf.predict(valid_data)
     ERR = 1 - np.sum(predict == valid_labels.T[0])/350.0
 
-    ii = np.argsort(rf.feature_importances_)
-    uno = ii[-1]
-    dos = ii[-2]
-    
-    print x, 1-ERR, uno, dos
+    sort = np.argsort(rf.feature_importances_)
+    for i in range(len(sort)):
+        ii[sort[i]]+=i                   
 
-
+for p in range(len(predict)):
+    if(predict[p]>=5):
+        predict[p]=1
+    else:
+        predict[p]=0
+                   
+ERR = 1 - np.sum(predict == valid_labels.T[0])/350.0
+print(ERR)
